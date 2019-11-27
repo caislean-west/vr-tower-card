@@ -1,0 +1,74 @@
+# Blender MTL File: 'Tower_Assembled.blend'
+# Material Count: 6
+
+newmtl ShaderfxShader113_ring_stone
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_wall_maptower_parts_a_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_wall_maptower_parts_a_col.png
+
+newmtl ShaderfxShader114
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_cmntex_etc_boxpartsnet_a_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_cmntex_etc_boxpartsnet_a_col.png
+
+newmtl ShaderfxShader147_sand_normal.001
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_dgnobj_sanddirt_01_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_dgnobj_sanddirt_01_col.png
+
+newmtl ShaderfxShader7_pillar_before
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_wall_maptower_parts_a_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_wall_maptower_parts_a_col.png
+
+newmtl testtest_test_taihi_ShaderfxShader16
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_rock_drcstonestand_a_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_rock_drcstonestand_a_col.png
+
+newmtl testtest_test_taihi_ShaderfxShader8
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_dgnobj_blackbase_01_col.png
+map_d C:\\Users\\Ben\\Research Notes\\Aaron VR BDay\\_SITE_AaronVRCard\\models-dae\\Great Plateau Tower\\images\\zelda_tower_dgnobj_blackbase_01_col.png

@@ -1,0 +1,255 @@
+<html>
+  <head>
+		<script src="lib-js/aframe-v0.8.2.js"></script>
+    <script src="lib-js/aframe-teleport-controls.js"></script>
+    <!--
+    <script src="https://cdn.rawgit.com/AltspaceVR/aframe-altspace-component/v1.3.2/dist/aframe-altspace-component.min.js"></script>
+		<script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+    -->
+    <script src="portal-stone.js"></script>
+		<script>
+		</script>
+  </head>
+  <body>
+    <a-scene>
+
+      <a-assets>
+        <a-asset-item id="level-obj" src="models-obj/PastVillage/PastVillage.obj"></a-asset-item>
+        <a-asset-item id="level-mtl" src="models-obj/PastVillage/PastVillage.mtl"></a-asset-item>
+
+        <a-asset-item id="level-gltf" src="models-gltf/PastVillage.gltf"></a-asset-item>
+        <a-asset-item id="tailsdoll" src="models-gltf/TailsDoll.gltf"></a-asset-item>
+        <a-asset-item id="emeraldshard" src="models-gltf/EmeraldPiece.gltf"></a-asset-item>
+
+        <a-asset-item id="vr_controller_vive-obj" src="models-obj/Controllers/vr_controller_vive.obj"></a-asset-item>
+        <a-asset-item id="vr_controller_vive-mtl" src="models-obj/Controllers/vr_controller_vive.mtl"></a-asset-item>
+
+        <a-asset-item id="vr_controller_daydream-obj" src="models-obj/Controllers/vr_controller_daydream.obj"></a-asset-item>
+        <a-asset-item id="vr_controller_daydream-mtl" src="models-obj/Controllers/vr_controller_daydream.mtl"></a-asset-item>
+
+        <a-asset-item id="gear_vr_controller-obj" src="models-obj/Controllers/gear_vr_controller.obj"></a-asset-item>
+        <a-asset-item id="gear_vr_controller-mtl" src="models-obj/Controllers/gear_vr_controller.mtl"></a-asset-item>
+
+				<img id="portal-stone-texture" src="models-obj/PastVillage/mr_064k_pcueye.png">
+				<a-mixin id="portal-stone-mixin"
+								 geometry="primitive: box" scale="0.8 0.3 0.8"
+								 material="src: #portal-stone-texture;"></a-mixin>
+				<a-mixin id="old-font-mixin"
+								 text="font: fonts/eaglelake/EagleLake-Regular.json;
+								       shader: msdf;
+								       color: #222210;"></a-mixin>
+				<a-mixin id="scary-font-mixin"
+								 text="font: fonts/creepstercaps/CreepsterCaps-Regular.json;
+								       shader: msdf;
+								       color: #740101;"></a-mixin>
+
+        <img id="sky" src="textures/sky.png">
+        <img id="sunset" src="textures/sunset2.jpg">
+
+		    <audio id="mystic-ruins-music" src="audio/MysticRuins.mp3"></audio>
+		    <audio id="ocean-waves" src="audio/CrispOceanWaves.mp3"></audio>
+      </a-assets>
+
+			<a-entity id="cameraRig" portal-traveller="1">
+	      <!-- camera -->
+	      <a-entity id="head" position="0 1.5 0" camera wasd-controls look-controls></a-entity>
+	      <!-- hand controls -->
+			  <!--
+				-->
+	      <a-entity id="right-hand"
+									teleport-controls="type: line; collisionEntities: #village-level; cameraRig: #cameraRig; teleportOrigin: #head; interval: 50; curveShootingSpeed: 8; curveNumberPoints: 60; landingMaxAngle: 60; maxLength: 30;"
+									teleport-log
+									controller-cursor
+									laser-controls
+									vive-controls="hand: right;"
+									daydream-controls
+									gearvr-controls
+									>
+									<a-box scale="0.035 0.015	0.07" color="#006666"></a-box>
+				</a-entity>
+	    </a-entity>
+
+      <!--
+      <a-entity position="0 -640 0" obj-model="obj: #level-obj; mtl: #level-mtl"></a-entity>
+      -->
+
+      <a-light type="ambient" color="#FFF"></a-light>
+      <a-sky position="0 -1000 0" rotation="0 140 0" src="#sunset"></a-sky>
+
+      <!--
+      <a-gltf-model id="village-level" position="0 -640 0" src="#level-gltf"></a-gltf-model>
+      <a-obj-model id="village-level" position="0 -157.5 0" scale="0.25 0.25 0.25" src="#level-obj" mtl="#level-mtl"></a-obj-model>
+      -->
+			<!-- LEVEL MODELS -->
+      <a-obj-model id="village-level" position="0 -78.7 0" scale="0.125 0.125 0.125" src="#level-obj" mtl="#level-mtl"></a-obj-model>
+
+			<a-entity position="0 -100 30"
+								sound="src: #mystic-ruins-music; maxDistance: 10000;
+											 refDistance: 10; volume: 0.35;
+											 loop: true; autoplay: true;"
+			></a-entity>
+			<a-entity position="0 -100 -200"
+								sound="src: #ocean-waves; maxDistance: 400;
+											 refDistance: 3; rolloffFactor: 5; volume: 1.3;
+											 loop: true; autoplay: true;"
+			></a-entity>
+
+			<!-- PORTAL STONES -->
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-top-r" portal-stone="targetid: portal-building-top"
+						 	  position="2.5 -1.07 0"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-top-l" portal-stone="targetid: portal-topfloor"
+						 		position="-2.5 -1.07 0"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-top-d" portal-stone="targetid: portal-bottom"
+						 		position="0 -0.07 2.5"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-top-u" portal-stone="targetid: portal-ocean;"
+						 		position="0 -0.07 -2.5"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-safety" portal-stone="targetid: portal-top-d; method: point;"
+						 	 	position="0 -100 0"
+								scale="40 40 100"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-ocean" portal-stone="targetid: portal-top-d"
+						 	 	position="0 -66.321 -100"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-building-top" portal-stone="targetid: portal-building-bottom"
+						 		position="103.981 -53.801 122.588"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-building-bottom" portal-stone="targetid: portal-building-top"
+						 		position="103.981 -66.305 3.407"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-bottom" portal-stone="targetid: portal-middle"
+						 		position="0 -78.819 61.904"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-middle" portal-stone="targetid: portal-top-d"
+						 		position="0 -41.320 19.766"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-behind" portal-stone="targetid: portal-topfloor"
+						 		position="-93.689 -53.824 -97.609"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-topfloor" portal-stone="targetid: portal-behind"
+						 		position="-103.985 -41.296 122.455"
+			></a-entity>
+
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-hidden" portal-stone="targetid: portal-secret"
+						 		position="-33.279 -75.652 131.967"
+								scale="1.2 0.3 1.2"
+								rotation="50 -45 0"
+			></a-entity>
+			<a-entity mixin="portal-stone-mixin"
+								id="portal-secret" portal-stone="targetid: portal-secret"
+						 		position="-126.207 -0.689 -91.826"
+			></a-entity>
+
+			<!-- OTHER ITEMS -->
+			<!--
+								font="fonts/THAILAND.TTF-msdf.json"
+								fontImage="fonts/THAILANDTTF.0.png"
+								negate="false"
+			-->
+			<a-plane id="instructions-1"
+						 	 position="-2.5 0.06 0"
+						   rotation="-90 90 0"
+							 width="1" height="1"
+							 material="alphaTest: 1.0;">
+				<a-text value="Click the trackpad and point to teleport.\n\nStepping on a glowing tile warps to the linked tile."
+								align="center" anchor="center" baseline="top"
+							  width="1.95" wrap-count="20"
+								mixin="old-font-mixin"></a-text>
+			</a-plane>
+
+			<a-plane id="instructions-2"
+						 	 position="2.5 0.06 0"
+						   rotation="-90 -90 0"
+							 width="1" height="1"
+							 material="alphaTest: 1.0;">
+				<a-text value="Legends say the echidnas ran from the setting sun and were driven to madness! Look down carefully, push the limit, and you will find what they found so long ago."
+								align="center" anchor="center" baseline="top"
+							  width="1.95" wrap-count="26"
+								mixin="old-font-mixin"></a-text>
+			</a-plane>
+
+			<a-plane id="scary-roof-hint"
+						 	 position="-3.500 -28.660 180.396"
+						   rotation="-90 -3 0"
+							 width="1" height="1"
+							 material="alphaTest: 1.0;">
+				<a-text value="He's right behind you"
+								align="center" anchor="center" baseline="top"
+							  width="10" wrap-count="26"
+								mixin="scary-font-mixin"></a-text>
+			</a-plane>
+
+			<a-plane id="glitch-hint"
+						 	 position="-8.689 -16.517 199.704"
+						   rotation="0 0 0"
+							 width="1" height="1"
+							 material="alphaTest: 1.0;">
+				<a-text value="He is always watching you, Aaron.\n\nGlitch through the wall to escape, Knuckles-style!"
+								align="center" anchor="center" baseline="top"
+							  width="15" wrap-count="28"
+								mixin="old-font-mixin"
+								color="white"></a-text>
+			</a-plane>
+
+      <a-gltf-model id="tailsdoll" position="-13.147 -20.443 208.812"
+										scale="0.1 0.1 0.1" rotation="0 180 0"
+										src="#tailsdoll">
+							<a-animation attribute="position"
+													 to="-13.147 -18.443 208.812"
+													 dur="3000"
+													 easing="linear"
+													 direction="alternate" repeat="indefinite"></a-animation>
+			</a-gltf-model>
+
+			<a-entity id="shardRing" position="0 2 0" scale="0.75 0.75 0.7">
+
+							<a-animation attribute="rotation" to="0 360 0" dur="30000"
+													 direction="forward" repeat="indefinite"
+													 easing="linear">
+							</a-animation>
+							<a-gltf-model src="#emeraldshard" position="0 1.9 -9" scale="0.25 0.25 0.25">
+											<a-animation attribute="position"
+																	 to="0 0 -9"
+																	 dur="1500"
+																	 direction="alternate" repeat="indefinite">
+							</a-gltf-model>
+							<a-gltf-model src="#emeraldshard" position="7.8 0 4.5" scale="0.25 0.25 0.25">
+											<a-animation attribute="position"
+																	 to="7.8 1.9 4.5"
+																	 dur="2000"
+																	 direction="alternate" repeat="indefinite">
+							</a-gltf-model>
+							<a-gltf-model src="#emeraldshard" position="-7.8 0 4.5" scale="0.25 0.25 0.25">
+											<a-animation attribute="position"
+																	 to="-7.8 1.9 4.5"
+																	 dur="2500"
+																	 direction="alternate" repeat="indefinite">
+							</a-gltf-model>
+			</a-entity>
+
+      <!--<a-sky color="#ECECEC"></a-sky>-->
+
+    </a-scene>
+  </body>
+</html>

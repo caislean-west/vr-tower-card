@@ -1,0 +1,206 @@
+<html>
+  <head>
+		<script src="lib-js/aframe-v0.8.2.js"></script>
+    <script src="lib-js/aframe-teleport-controls.min.js"></script>
+		<!--
+		<script src="https://cdn.rawgit.com/AltspaceVR/aframe-altspace-component/v1.3.2/dist/aframe-altspace-component.min.js"></script>
+		<script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+		-->
+		<script src="portal-stone.js"></script>
+		<script src="under-menu.js"></script>
+		<script src="trackpad-swipe.js"></script>
+
+		<script>
+		AFRAME.registerComponent('log', {
+						schema: {type: 'string'},
+						init: function() {
+										var stringToLog = this.data;
+										console.log(stringToLog);
+						}
+		});
+
+		AFRAME.registerComponent('do-something-once-loaded', {
+		  init: function () {
+		    // This will be called after the entity has properly attached and loaded.
+		    console.log('I am ready!');
+		  }
+		});
+
+
+		AFRAME.registerComponent('textfn2', {
+      init: function () {
+				var cstr = "";
+				var glist = navigator.getGamepads();
+
+				cstr += "There are (";
+				cstr += glist.length;
+				cstr += ") gamepads detected.\n";
+
+				for (var i = 0; i < glist.length; i++) {
+					cstr += i;
+					cstr += ":\n";
+					cstr += (glist[i] != null) ? glist[i].id.toString() : "NULL";
+					//cstr += (glist[i] != null) ? "DAMN" : "NULL";
+					cstr += "\n";
+				}
+				this.el.setAttribute("value", cstr);
+		  }
+		});
+
+    window.addEventListener("gamepadconnected", function(e) {
+      console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+        e.gamepad.index, e.gamepad.id,
+        e.gamepad.buttons.length, e.gamepad.axes.length);
+    });
+
+
+		AFRAME.registerComponent('scale-on-mouseenter', {
+	    schema: {
+	      to: {default: '2.5 2.5 2.5'}
+	    },
+
+	    init: function () {
+	      var data = this.data;
+				this.data.from = this.el.getAttribute("scale").toArray().toString();
+				console.log("scale init");
+				//console.log(from);
+	      this.el.addEventListener('mouseenter', function () {
+					console.log("grow");
+	        this.setAttribute('scale', data.to);
+	      });
+	      this.el.addEventListener('mouseleave', function () {
+					console.log("shrink");
+	        this.setAttribute('scale', data.from);
+	      });
+	    }
+	  });
+
+		</script>
+  </head>
+  <body>
+		<!--
+    <a-scene altspace="vertical-align: center;" log="Test, log.">
+		-->
+    <a-scene log="Test, log.">
+
+			<a-assets>
+				<img id="skyTexture" src="textures/sky.png">
+				<img id="groundTexture" src="textures/ground.jpg">
+
+        <a-asset-item id="vr_controller_vive-obj" src="models-obj/Controllers/vr_controller_vive.obj"></a-asset-item>
+        <a-asset-item id="vr_controller_vive-mtl" src="models-obj/Controllers/vr_controller_vive.mtl"></a-asset-item>
+
+		    <audio id="ring-sound" src="audio/Ring.mp3"></audio>
+		    <audio id="menu-open-sound" src="audio/OOT_PauseMenu_Open_Mono.mp3"></audio>
+		    <audio id="menu-close-sound" src="audio/OOT_PauseMenu_Close_Mono.mp3"></audio>
+			</a-assets>
+
+			<!--a-entity environment="preset: forest; dressingAmount: 500"></a-entity -->
+			<a-sky src="#skyTexture"></a-sky>
+			<a-plane id="floor"
+							 src="#groundTexture" repeat="10 10"
+							 width="30" height="30"
+						   rotation="-90 0 0"></a-plane>
+
+			<script>
+				var sceneEl = document.querySelector('a-scene');
+				var entityEl = document.createElement('a-entity');
+				entityEl.setAttribute('do-something-once-loaded', '');
+				sceneEl.appendChild(entityEl);
+			</script>
+<!--
+			<a-entity
+			  tracked-controls
+			  vive-controls
+				daydream-controls
+			  oculus-touch-controls
+			  hand-controls
+			  controller-cursor
+			  sphere-collider
+			  grab
+			  throw
+			  event-set="_event: grabstart; visible: false"
+			  event-set="_event: grabend; visible: true"
+			> </a-entity>
+-->
+			<a-entity id="cameraRig">
+	      <!-- camera -->
+	      <a-entity id="head" position="0 1.5 0" camera wasd-controls look-controls></a-entity>
+	      <!-- hand controls -->
+			  <!--
+				-->
+	      <a-entity id="right-hand"
+									teleport-controls="cameraRig: #cameraRig; teleportOrigin: #head;"
+									trackpad-swipe
+									controller-cursor
+									laser-controls
+									vive-controls="hand: right;"
+									daydream-controls
+									under-menu="type: look;"
+									trackpad-swipe-visualizer
+									>
+									<a-box scale="0.035 0.015	0.07" color="#006666"></a-box>
+									<a-entity id="under-menu-open-sound"
+													  sound="src: #menu-open-sound; volume: 0.2"
+									   			 	></a-entity>
+									<a-entity id="under-menu-close-sound"
+													  sound="src: #menu-close-sound; volume: 0.2"
+									   			 	></a-entity>
+				</a-entity>
+	    </a-entity>
+
+			<a-obj-model src="#vr_controller_vive-obj" src="#vr_controller_vive-mtl"
+					position="1 1.4 -0.3" scale="1 1 1" rotation="30 0 0">
+							<a-animation attribute="rotation" to="30 360 0" dur="10000" repeat="indefinite" direction="forward" easing="linear"></a-animation>
+			</a-obj-model>
+
+			<a-plane id="file"
+							 scale-on-mouseenter="to: 2 2 2"
+							 position="0 1.4 -0.3"
+							 rotation="0 0 0"
+							 width="0.2" height="0.14"
+							 scale="1 1 1"
+							 color="#888">
+				<a-text value="Cursors don't work closer than a half meter!"
+								align="left" anchor="center" baseline="center"
+							  width="0.15" wrap-count="15"></a-text>
+				<a-animation attribute="position" to="0 1.42 -0.3" direction="alternate" dur="2000" repeat="indefinite"></a-animation>
+			</a-plane>
+
+			<a-plane id="file3"
+							 scale-on-mouseenter="to: 2 2 2"
+							 position="0 1.2 -0.25"
+							 rotation="0 0 0"
+							 width="0.2" height="0.14"
+							 scale="1 1 1"
+							 color="#888">
+				<a-text value="The quick brown fox jumps over the lazy dog."
+								align="left" anchor="center" baseline="center"
+								font="fonts/eaglelake/EagleLake-Regular.json"
+								shader="msdf"
+							  width="0.15" wrap-count="15"></a-text>
+			</a-plane>
+			<a-plane id="file2"
+							 scale-on-mouseenter="to: 2 2 2"
+							 position="-1 1.4 -0.3"
+							 rotation="0 45 0"
+							 width="0.5" height="0.9"
+							 scale="1 1 1"
+							 color="#888">
+				<a-text id="text2" textfn2
+								value="Cursors don't work closer than a half meter!"
+								align="left" anchor="center" baseline="center"
+							  width="0.45" wrap-count="15"></a-text>
+			</a-plane>
+
+
+      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      <a-plane position="0.01 0.01 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      <!--<a-sky color="#ECECEC"></a-sky>-->
+
+      <a-entity id="light" light="type: ambient; color: #888"></a-entity>
+    </a-scene>
+  </body>
+</html>
