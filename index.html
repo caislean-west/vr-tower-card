@@ -6,13 +6,119 @@
     <script src="https://cdn.rawgit.com/AltspaceVR/aframe-altspace-component/v1.3.2/dist/aframe-altspace-component.min.js"></script>
 		<script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
-    -->
-
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/super-hands@3.0.0/dist/super-hands.min.js"></script>
+    -->
+
+    <script src="lib-js/aframe-extras.min.js"></script>
+    <script src="lib-js/aframe-text-geometry-component.min.js"></script>
+    <script src="lib-js/aframe-log-component.min.js"></script>
+    <script src="lib-js/aframe-animation-component.min.js"></script>
+    <script src="lib-js/aframe-aabb-collider-component.min.js"></script>
 
     <script src="portal-stone.js"></script>
+
 		<script>
+
+
+AFRAME.registerComponent('collider-check', {
+
+  init: function () {
+    this.soundEl = this.el.querySelector("#ring-sound");
+
+    var self = this;
+
+    this.el.addEventListener('raycaster-intersection', function(evt) {
+      var objId = evt.detail.els[0].id;
+
+      AFRAME.log(objId, 'hand');
+      self.soundEl.components.sound.playSound();
+
+      // Make the character visible
+      if (objId == 'trophy-wiifit') {
+        charEl = document.querySelector("#wii-fit-trainer");
+      } else if (objId == 'trophy-akira') {
+        charEl = document.querySelector("#akira");
+      } else if (objId == 'trophy-grayfox') {
+        charEl = document.querySelector("#gray-fox");
+      }
+      if (charEl != null) {
+        charEl.setAttribute('visible',true);
+        charEl.components.sound.playSound();
+      }
+    });
+
+    AFRAME.log('Collider-check initialized','hand');
+  }
+});
+
+AFRAME.registerComponent('button-summon', {
+  checkAllVisible: function() {
+    var charIds = ['#wii-fit-trainer','#akira','#gray-fox'];
+    var cid;
+    var weCool = true;
+
+    for (cid of charIds) {
+      var charEl = document.querySelector(cid);
+      if (!charEl.getAttribute('visible')) {
+        weCool = false;
+      }
+    }
+    return weCool;
+  },
+  init: function() {
+    this.gotEmYet = false;
+    this.startedYet = false;
+
+    var self = this;
+
+    setInterval(function() {
+      var haveAll = self.checkAllVisible();
+      if (haveAll && !self.gotEmYet) {
+        self.gotEmYet = true;
+        self.el.emit('allTrophiesFound');
+        self.el.components.sound.playSound();
+      }
+    }, 500);
+
+    this.el.addEventListener('portal-announce', function() {
+      AFRAME.log('Teleport detected','hand');
+      if (!self.startedYet) {
+        self.el.emit('trigger-show');
+        AFRAME.log('Show trigger event has been emitted...','hand');
+        self.startedYet = true;
+      }
+    });
+  }
+});
+
+AFRAME.registerComponent('show-launcher', {
+  init: function() {
+    this.el.addEventListener('trigger-show', function() {
+      AFRAME.log('Launcher received trigger event!','hand');
+      // Play Shoop
+      document.querySelector('#music-box').components.sound.playSound();
+      // Fade in topMessage
+      document.querySelector('#texttop').emit('fadein');
+      document.querySelector('#textbottom').emit('fadein');
+      // Delayed enable dance!
+      setTimeout(function() {
+        var charIds = ['#wii-fit-trainer','#akira','#gray-fox'];
+        var cid;
+
+        for (cid of charIds) {
+          var charEl = document.querySelector(cid);
+          var amixcmd = 'clip: Dance;';
+          if (cid == '#gray-fox') {
+            amixcmd = 'clip: Dance; duration: 20;';
+          }
+          charEl.setAttribute('animation-mixer', amixcmd);
+        }
+      }, 4000);
+    });
+  }
+});
+
 		</script>
   </head>
   <body>
@@ -29,7 +135,8 @@
         <a-asset-item id="tailsdoll" src="models-gltf/TailsDoll.gltf"></a-asset-item>
         <a-asset-item id="emeraldshard" src="models-gltf/EmeraldPiece.gltf"></a-asset-item>
 
-        <a-asset-item id="assisttrophy" src="models-gltf/AssistTrophy.glb"></a-asset-item>
+        <a-asset-item id="assisttrophyOLD" src="models-gltf/AssistTrophy.glb"></a-asset-item>
+        <a-asset-item id="assisttrophy" src="models-gltf/AssisTrophy.gltf"></a-asset-item>
         <a-asset-item id="homerunbat" src="models-gltf/HomeRunBat.glb"></a-asset-item>
 
         <a-asset-item id="vr_controller_vive-obj" src="models-obj/Controllers/vr_controller_vive.obj"></a-asset-item>
@@ -40,6 +147,8 @@
 
         <a-asset-item id="gear_vr_controller-obj" src="models-obj/Controllers/gear_vr_controller.obj"></a-asset-item>
         <a-asset-item id="gear_vr_controller-mtl" src="models-obj/Controllers/gear_vr_controller.mtl"></a-asset-item>
+
+        <a-asset-item id="glowring" src="models-gltf/GlowRing.glb"></a-asset-item>
 
 				<img id="portal-stone-texture" src="models-obj/PastVillage/mr_064k_pcueye.png">
 				<a-mixin id="portal-stone-mixin"
@@ -54,33 +163,65 @@
 								       shader: msdf;
 								       color: #740101;"></a-mixin>
 
+        <a-mixin id="FadingGeomText"
+                animation__fadein="property: components.material.material.opacity; dur: 10000; easing: linear; from: 0; to: 1; startEvents: fadein"
+                animation__fadeout="property: components.material.material.opacity; dur: 10000; easing: linear; from: 1; to: 0; startEvents: fadeout"
+                ></a-mixin>
+
+        <a-asset-item id="optimerBoldFont" src="fonts/mandalore/Mandalore_Regular.json"></a-asset-item>
+        <a-mixin id="boldFont" text="font: #optimerBoldFont"></a-mixin>
+
         <img id="sky" src="textures/sky.png">
         <img id="sunset" src="textures/sunset2.jpg">
 
+        <audio id="ring-noise" src="audio/Ring.mp3"></audio>
+        <audio id="ping-noise" src="audio/Ping.wav"></audio>
+        <audio id="switch-noise" src="audio/OOT_Switch.wav"></audio>
 		    <audio id="mystic-ruins-music" src="audio/MysticRuins.mp3"></audio>
 		    <audio id="ocean-waves" src="audio/CrispOceanWaves.mp3"></audio>
+
+        <audio id="shout-wiifit" src="audio/WiiFit_SaluteTheSun.wav"></audio>
+        <audio id="shout-akira" src="audio/AkiraYell.wav"></audio>
+        <audio id="shout-grayfox" src="audio/GrayFox_LikeOldTimes.mp3"></audio>
+
+        <audio id="music-shoop" src="audio/Shoop.mp3"></audio>
       </a-assets>
 
-			<a-entity id="cameraRig" portal-traveller="1">
+			<a-entity id="cameraRig" class="player" portal-traveller="1">
 	      <!-- camera -->
 	      <a-camera id="head" wasd-controls look-controls></a-camera>
 	      <!-- hand controls -->
 			  <!--
+        controller-cursor
+        laser-controls
         super-hands hand-controls="right"
 				-->
-	      <a-entity id="right-hand"
+	      <a-entity id="right-hand" class="player"
                   teleport-controls="type: line; collisionEntities: #tower-level-collider; cameraRig: #cameraRig; teleportOrigin: #head; interval: 50; curveShootingSpeed: 8; curveNumberPoints: 60; landingMaxAngle: 60; maxLength: 30;"
                   teleport-log
-                  controller-cursor
-                  laser-controls
+
                   tracked-controls
                   vive-controls="hand: right;"
 
                   daydream-controls
                   gearvr-controls
+
+                  collider-check
 									>
-									<a-box scale="0.035 0.015	0.07" color="#006666"></a-box>
+                  <a-gltf-model class="player" id="home-run-bat" rotation="-90 0 0" position="0 0 -0.2" scale="7.5 7.5 7.5" src="#homerunbat"></a-gltf-model>
+                  <a-entity id="bat-cast" raycaster="objects: .item; far: 0.8; showLine: true;"></a-entity>
+                  <a-box scale="0.035 0.015	0.07" color="#006666" visible="false"></a-box>
+                  <a-entity id="ring-sound"
+                            position="0 0 0"
+            								sound="src: #ping-noise; maxDistance: 10;
+            											 refDistance: 10; volume: 0.4;
+            											 loop: false; autoplay: false;"
+            			></a-entity>
 				</a-entity>
+
+        <a-entity id="player-collider" class="player"
+                  geometry="primitive: box; width: 0.2; length: 0.2; height: 2;"
+                  visible="false"></a-entity>
 	    </a-entity>
 
       <!--
@@ -99,11 +240,7 @@
       											 refDistance: 10; volume: 0.35;
       											 loop: true; autoplay: true;"
       			></a-entity>
-      			<a-entity position="0 -100 -200"
-      								sound="src: #ocean-waves; maxDistance: 400;
-      											 refDistance: 3; rolloffFactor: 5; volume: 1.3;
-      											 loop: true; autoplay: true;"
-      			></a-entity>
+
 
       -->
 			<!-- LEVEL MODELS -->
@@ -117,16 +254,66 @@
       </a-gltf-model>
       <a-light type="directional" position = "0 2.5 -10" intensity="15" distance="50" color="#f3e2be"></a-light>
       <a-light type="point" position = "4.8 4 2.2" intensity="45" distance="5" color="#f3e2be"></a-light>
+      <a-entity position="0 -10 0"
+                sound="src: #ocean-waves; maxDistance: 100;
+                       refDistance: 3; rolloffFactor: 5; volume: 0.25;
+                       loop: true; autoplay: true;"
+      ></a-entity>
+      <a-entity id="music-box"
+                position="6 0 0"
+                sound="src: #music-shoop; maxDistance: 30;
+                       refDistance: 10; rolloffFactor: 5; volume: 0.35;
+                       loop: true; autoplay: false;"
+      ></a-entity>
 
 
       <!-- The Whole Gang -->
 
       <a-gltf-model id="gray-fox" src="#grayfox"
                     position="6.5 0 0" rotation="0 -90 0" scale="4.5 4.5 4.5"
-                    animation-mixer="clip: IdleStill;"
+                    animation-mixer="clip: Idle; duration: 10;"
+                    visible="false";
+                    sound="src: #shout-grayfox; maxDistance: 100;
+                           refDistance: 10; volume: 0.5;
+                           loop: false; autoplay: false;"
                     ></a-gltf-model>
+      <!-- clip names
+      Idle
+      IdleStill
+      Dance
+      CoolFlip
+      -->
+      <a-gltf-model id="wii-fit-trainer" src="#wiifittrainer"
+                    position="5.5 0 -2.5" rotation="0 -80 0" scale="0.095 0.095 0.095"
+                    animation-mixer="clip: Idle;"
+                    visible="false";
+                    sound="src: #shout-wiifit; maxDistance: 100;
+                           refDistance: 10; volume: 0.5;
+                           loop: false; autoplay: false;"
+                    ></a-gltf-model>
+      <!-- clip names
+      Idle
+      Stretch
+      Hops
+      Dance
+      -->
+      <a-gltf-model id="akira" src="#akiraasset"
+                    position="5.5 0 2.5" rotation="0 -90 0" scale="4.5 4.5 4.5"
+                    animation-mixer="clip: Idle;"
+                    visible="false";
+                    sound="src: #shout-akira; maxDistance: 100;
+                           refDistance: 10; volume: 0.5;
+                           loop: false; autoplay: false;"
+                    ></a-gltf-model>
+      <!-- clip names
+      Idle
+      Punches
+      Flex
+      Dance
+      -->
 
-      <a-plane id="note"
+
+      <a-plane id="note" visible="false"
 							 scale-on-mouseenter="to: 2 2 2"
 							 position="1.5 1.3 0"
 							 rotation="-30 -90 0"
@@ -140,18 +327,68 @@
                 color="#000"></a-text>
 			</a-plane>
 
-      <!--
-      <a-gltf-model id="assist-trophy-1" position="2.5 0.37 -0.5" rotation="0 -90 0" scale="1.5 1.5 1.5" src="#assisttrophy"></a-gltf-model>
-      <a-gltf-model id="home-run-bat" position="2.5 0.571 0.5" scale="7.5 7.5 7.5" src="#homerunbat"></a-gltf-model>
+      <a-entity id="glowing-platform"
+                position="0 -100 0"
+                animation="property: position; to: 0 0 0; duration: 1; startEvents: allTrophiesFound;"
+                button-summon
+                show-launcher
+                sound="src: #switch-noise; maxDistance: 30;
+                       refDistance: 3; rolloffFactor: 5; volume: 0.35;
+                       loop: false; autoplay: false;"
+                >
+        <a-entity mixin="portal-stone-mixin" id="portal-top-r"
+                  portal-stone="targetid: portal-top-r"
+                  portal-speaker
+                  position="0.8916 -0.25056 0" scale="1.20461 0.45173 1.20461"
+                  material="shader: flat; color: rgba(243,243,243,1)"
+                  animation="dir: alternate; from: #FFF; loop: true; property: material.color; to: #AAA"
+                  ></a-entity>
+      </a-entity>
 
-      <a-gltf-model id="wii-fit-trainer" src="#wiifittrainer"
-                    position="5.5 0 -2.5" rotation="0 -80 0" scale="0.095 0.095 0.095"
-                    animation-mixer="clip: Stretch;"
-                    ></a-gltf-model>
-      <a-gltf-model id="akira" src="#akiraasset"
-                    position="5.5 0 2.5" rotation="0 -90 0" scale="4.5 4.5 4.5"
-                    animation-mixer="clip: Idle;"
-                    ></a-gltf-model>
+      <a-entity id="BdayText"
+                position="15 4.5 0"
+                rotation="0 -90 0"
+                scale="3 3 3">
+        <a-entity id='texttop'
+                  position="-1.8 0 0"
+                  mixin="FadingGeomText"
+                  text-geometry="value: Happy Birthday; font: #optimerBoldFont; wrap-count: 8;"
+                  material="blending: additive; color: #3f3f3f; opacity: 0;"></a-entity>
+        <a-entity position="-1.2 -1 0"
+                  id='textbottom'
+                  scale="1.5 1.5 1.5"
+                  mixin="FadingGeomText"
+                  text-geometry="value: Aaron!; font: #optimerBoldFont; wrap-count: 8;"
+                  material="blending: additive; color: #3f3f3f; opacity: 0;"></a-entity>
+      </a-entity>
+
+      <!--
+      position="1.99772 -0.07312 -6.12461" rotation="0 -68.7663945716014 0" //floor
+      -->
+      <a-entity class="item" position="4.78168 0.87286 -5.28365" rotation="0 -77.9824207062807 0">
+        <a-gltf-model id="assist-trophy-1" scale="1.5 1.5 1.5" src="#assisttrophy" gltf-model="models-gltf/AssisTrophy.gltf"></a-gltf-model>
+        <a-entity id="trophy-wiifit" class="item" geometry="primitive: box;" scale="0.25 0.5 0.25" position="0 0.25 0" visible="false"></a-entity>
+        <a-log id="fuckkkkk" channel="hand" position="0 2 -0.8" visible="false"></a-log>
+      </a-entity>
+      <!--
+      -->
+      <a-entity class="item" position="3.978 0.56711 7.10297" rotation="0 -117.95997790373876 0">
+        <a-gltf-model id="assist-trophy-2" scale="1.5 1.5 1.5" src="#assisttrophy" gltf-model="models-gltf/AssisTrophy.gltf"></a-gltf-model>
+        <a-entity id="trophy-akira" class="item" geometry="primitive: box;" scale="0.25 0.5 0.25" position="0 0.25 0" visible="false"></a-entity>
+      </a-entity>
+      <!--
+      position="-3.72909 -0.00169 0.21669" rotation="0 -90 0"
+      -->
+      <a-entity class="item" position="-8.9651 1.2736 0.0412" rotation="0 -90 0">
+        <a-gltf-model id="assist-trophy-3" scale="1.5 1.5 1.5" src="#assisttrophy" gltf-model="models-gltf/AssisTrophy.gltf"></a-gltf-model>
+        <a-entity id="trophy-grayfox" class="item" geometry="primitive: box;" scale="0.25 0.5 0.25" position="0 0.25 0" visible="false"></a-entity>
+      </a-entity>
+
+      <!--
+
+
+
+
       -->
 
 			<!-- PORTAL STONES -->
